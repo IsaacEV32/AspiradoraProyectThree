@@ -46,6 +46,8 @@ AAspiradoraGameCharacter::AAspiradoraGameCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
 
+	hud = CreateDefaultSubobject<UHUDPlayer>(TEXT("HUD"));
+
 	//Set default values for dash
 	canDash = true;
 	dashDistance = 6000.0f;
@@ -54,6 +56,12 @@ AAspiradoraGameCharacter::AAspiradoraGameCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+}
+
+void AAspiradoraGameCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	OnTakePointDamage.AddUniqueDynamic(this, &AAspiradoraGameCharacter::OnPointDamage);
 }
 
 void AAspiradoraGameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -179,4 +187,19 @@ void AAspiradoraGameCharacter::StopDashing()
 void AAspiradoraGameCharacter::ResetDash()
 {
 	canDash = true;
+}
+void AAspiradoraGameCharacter::OnPointDamage(AActor* DamagedActor,
+	float Damage,
+	AController* InstigatedBy,
+	FVector HitLocation,
+	UPrimitiveComponent* FHitComponent,
+	FName BoneName,
+	FVector ShotFromDirection,
+	const UDamageType* DamageType,
+	AActor* DamageCauser)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, TEXT("Player received damage"));
+	int LifeLost = FMath::CeilToInt(Damage);
+
+	hud->ApplyDamage(true, LifeLost);
 }

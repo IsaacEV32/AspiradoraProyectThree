@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+#include "Public/HUD/HUDPlayer.h"
 #include "AspiradoraGameCharacter.generated.h"
 
 class USpringArmComponent;
@@ -30,8 +31,11 @@ class AAspiradoraGameCharacter : public ACharacter
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FollowCamera;
+
 	
 protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HUD")
+	TObjectPtr<UHUDPlayer> hud;
 
 	/** Jump Input Action */
 	UPROPERTY(EditAnywhere, Category="Input")
@@ -97,6 +101,20 @@ public:
 	UFUNCTION()
 	void ResetDash();
 
+	UFUNCTION()
+	void OnPointDamage(AActor* DamagedActor,
+		float Damage,
+		AController* InstigatedBy,
+		FVector HitLocation,
+		UPrimitiveComponent* FHitComponent,
+		FName BoneName,
+		FVector ShotFromDirection,
+		const UDamageType* DamageType,
+		AActor* DamageCauser);
+
+	UFUNCTION()
+	void BeginPlay() override;
+
 public:
 
 	/** Returns CameraBoom subobject **/
@@ -121,5 +139,7 @@ public:
 
 	UPROPERTY()
 	FTimerHandle unusedHandle;
+	//////////
+	
 };
 

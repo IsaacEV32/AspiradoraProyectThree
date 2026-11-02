@@ -21,7 +21,7 @@ public class AspiradoraGame : ModuleRules
 			"Slate"
 		});
 
-		PrivateDependencyModuleNames.AddRange(new string[] { });
+		PublicDependencyModuleNames.AddRange(new string[] { "SlateCore"   });
 
 		PublicIncludePaths.AddRange(new string[] {
 			"AspiradoraGame",
