@@ -15,13 +15,6 @@ float UHUDPlayer::GetHealth()
 {
 	return currentLives;
 }
-
-FText UHUDPlayer::GetHealthIntText()
-{
-	FString livesHUD = FString::FromInt(currentLives);
-	FText livesHUDText = FText::FromString("Lives:" + livesHUD);
-	return livesHUDText;
-}
 //Invencibility timer
 void UHUDPlayer::SetDamageState()
 {

@@ -111,6 +111,8 @@ public:
 		FVector ShotFromDirection,
 		const UDamageType* DamageType,
 		AActor* DamageCauser);
+	UFUNCTION()
+	UHUDPlayer* GetHUDComponent();
 
 	UFUNCTION()
 	void BeginPlay() override;

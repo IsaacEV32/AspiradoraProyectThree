@@ -18,6 +18,8 @@ public:
 	AHUDView();
 
 	virtual void BeginPlay() override;
+	FText GetHealthIntText(int currentLives);
+
 
 private:
 

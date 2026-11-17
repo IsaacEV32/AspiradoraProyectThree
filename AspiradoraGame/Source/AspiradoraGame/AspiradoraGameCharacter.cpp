@@ -203,3 +203,8 @@ void AAspiradoraGameCharacter::OnPointDamage(AActor* DamagedActor,
 
 	hud->ApplyDamage(true, LifeLost);
 }
+
+UHUDPlayer* AAspiradoraGameCharacter::GetHUDComponent()
+{
+	return hud;
+}

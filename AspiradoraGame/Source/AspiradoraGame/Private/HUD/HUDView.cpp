@@ -13,7 +13,6 @@ AHUDView::AHUDView()
 void AHUDView::BeginPlay()
 {
 	Super::BeginPlay();
-
 	if (HUDWidgetClass != nullptr)
 	{
 		CurrentWidget = CreateWidget<UUserWidget>(GetWorld(), HUDWidgetClass);
@@ -27,4 +26,10 @@ void AHUDView::BeginPlay()
 			UE_LOG(LogTemp, Warning, TEXT("Viewport not initialized"));
 		}
 	}
+}
+FText AHUDView::GetHealthIntText(int currentLives)
+{
+	FString livesHUD = FString::FromInt(currentLives);
+	FText livesHUDText = FText::FromString("Lives:" + livesHUD);
+	return livesHUDText;
 }

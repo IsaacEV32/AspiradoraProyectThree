@@ -24,9 +24,6 @@ protected:
 public:
 	UFUNCTION(BlueprintPure, Category = "Health")
 	float GetHealth();
-
-	UFUNCTION(BlueprintPure, Category = "Health")
-	FText GetHealthIntText();
 	//Update health
 	UFUNCTION(BlueprintCallable, Category = "Health")
 	void UpdateHealth(int HealthChange);
