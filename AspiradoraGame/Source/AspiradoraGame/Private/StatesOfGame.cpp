@@ -16,18 +16,22 @@ void AStatesOfGame::CheckState()
 	{
 		case EStatesOfGame::InitialState:
 		{
+			//This will be the state of the main menu
 			break;
 		}
 		case EStatesOfGame::Running:
 		{
+			//Add the initialization of the player 
 			break;
 		}
 		case EStatesOfGame::Pause:
 		{
+			//Add functions when you pause the game
 			break;
 		}
 		case EStatesOfGame::Dead:
 		{
+			//Respawn the player 
 			break;
 		}
 	}
