@@ -66,6 +66,11 @@ protected:
 	/** Initialize input action bindings */
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual void BeginPlay() override;
+
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
+		class AController* EventInstigator, AActor* DamageCauser) override;
+
 protected:
 
 	/** Called for movement input */
@@ -100,7 +105,7 @@ public:
 
 	UFUNCTION()
 	void ResetDash();
-
+//Isaac
 	UFUNCTION()
 	void OnPointDamage(AActor* DamagedActor,
 		float Damage,
@@ -113,9 +118,25 @@ public:
 		AActor* DamageCauser);
 	UFUNCTION()
 	UHUDPlayer* GetHUDComponent();
-
+//
 	UFUNCTION()
 	void BeginPlay() override;
+	UFUNCTION(BlueprintCallable, Category = "Life")
+	void ReceiveDamage(int Amount);
+
+	UFUNCTION(BlueprintCallable, Category = "Life")
+	void Heal(int Amount);
+
+	UFUNCTION(BlueprintPure, Category = "Life")
+	bool IsDead() const { return life <= 0; }
+
+	//Evento de cambio de vida
+	UFUNCTION(BlueprintImplementableEvent, Category = "Life")
+	void OnLifeChanged(int NewLife, int MaxLife);
+
+	//Evento muerte
+	UFUNCTION(BlueprintImplementableEvent, Category = "Life")
+	void OnDeath();
 
 public:
 
@@ -126,6 +147,12 @@ public:
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 	///////////
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Life", meta = (ClampMin = "1"))
+	int maxLife;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Life", meta = (ClampMin = "0"))
+	int life;
 
 	UPROPERTY(EditAnywhere)
 	float dashDistance;

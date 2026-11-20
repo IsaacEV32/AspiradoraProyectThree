@@ -54,16 +54,24 @@ AAspiradoraGameCharacter::AAspiradoraGameCharacter()
 	dashCooldown = 0.5f;
 	dashStop = 0.1f;
 
+	maxLife = 3;
+	life = 3;
+
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
+void AAspiradoraGameCharacter::BeginPlay()
+{
+	Super::BeginPlay();
 
 void AAspiradoraGameCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	OnTakePointDamage.AddUniqueDynamic(this, &AAspiradoraGameCharacter::OnPointDamage);
-}
 
+	maxLife = 3;
+	life = 3;
+}
 void AAspiradoraGameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	// Set up action bindings
@@ -188,6 +196,7 @@ void AAspiradoraGameCharacter::ResetDash()
 {
 	canDash = true;
 }
+//Isaac
 void AAspiradoraGameCharacter::OnPointDamage(AActor* DamagedActor,
 	float Damage,
 	AController* InstigatedBy,
@@ -207,4 +216,51 @@ void AAspiradoraGameCharacter::OnPointDamage(AActor* DamagedActor,
 UHUDPlayer* AAspiradoraGameCharacter::GetHUDComponent()
 {
 	return hud;
+}
+//
+float AAspiradoraGameCharacter::TakeDamage(float damageAmount, FDamageEvent const& damageEvent,
+	AController* eventInstigator, AActor* damageCauser)
+{
+	const float Applied = Super::TakeDamage(damageAmount, damageEvent, eventInstigator, damageCauser);
+	ReceiveDamage(FMath::RoundToInt(Applied));
+	return Applied;
+}
+
+void AAspiradoraGameCharacter::ReceiveDamage(int amount)
+{
+	if (IsDead() || amount <= 0)
+	{
+		return;
+	}
+
+	life = FMath::Clamp(life - amount, 0, maxLife);
+	OnLifeChanged(life, maxLife);
+
+	if (life <= 0)
+	{
+		if (!canDash)
+		{
+			StopDashing();
+		}
+
+		GetCharacterMovement()->StopMovementImmediately();
+
+		if (APlayerController* PC = Cast<APlayerController>(GetController()))
+		{
+			DisableInput(PC);
+		}
+
+		OnDeath();
+	}
+}
+
+void AAspiradoraGameCharacter::Heal(int amount)
+{
+	if (IsDead() || amount <= 0)
+	{
+		return;
+	}
+
+	life = FMath::Clamp(life + amount, 0, maxLife);
+	OnLifeChanged(life, maxLife);
 }
