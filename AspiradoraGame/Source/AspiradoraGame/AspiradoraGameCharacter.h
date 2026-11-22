@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "Public/HUD/HUDPlayer.h"
+#include "NativeGameplayTags.h"
+#include "GameplayTagContainer.h"
 #include "AspiradoraGameCharacter.generated.h"
 
 class USpringArmComponent;
@@ -13,12 +15,17 @@ class UCameraComponent;
 class UInputAction;
 struct FInputActionValue;
 
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Player);
+
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 /**
  *  A simple player-controllable third person character
  *  Implements a controllable orbiting camera
  */
+UDELEGATE()
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnLifeChange, int, life, int, maxLife);
+
 UCLASS(abstract)
 class AAspiradoraGameCharacter : public ACharacter
 {
@@ -31,6 +38,8 @@ class AAspiradoraGameCharacter : public ACharacter
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FollowCamera;
+
+	
 
 	
 protected:
@@ -66,10 +75,8 @@ protected:
 	/** Initialize input action bindings */
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	virtual void BeginPlay() override;
-
-	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
-		class AController* EventInstigator, AActor* DamageCauser) override;
+	UFUNCTION()
+	virtual void TakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
 protected:
 
@@ -130,6 +137,7 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Life")
 	bool IsDead() const { return life <= 0; }
 
+	
 	//Evento de cambio de vida
 	UFUNCTION(BlueprintImplementableEvent, Category = "Life")
 	void OnLifeChanged(int NewLife, int MaxLife);
@@ -137,6 +145,9 @@ public:
 	//Evento muerte
 	UFUNCTION(BlueprintImplementableEvent, Category = "Life")
 	void OnDeath();
+
+	UFUNCTION()
+	int32& GetCurrentLife();
 
 public:
 
@@ -146,6 +157,8 @@ public:
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
+	FGameplayTagContainer InteractableTags;
+
 	///////////
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Life", meta = (ClampMin = "1"))
@@ -153,6 +166,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Life", meta = (ClampMin = "0"))
 	int life;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Life")
+	FOnLifeChange onLifeChange;
 
 	UPROPERTY(EditAnywhere)
 	float dashDistance;

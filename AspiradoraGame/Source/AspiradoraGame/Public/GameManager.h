@@ -21,14 +21,21 @@ class ASPIRADORAGAME_API UGameManager : public UGameInstance
 protected:
 	virtual void BeginPlay();
 public: 
+	UGameManager();
 	UFUNCTION(BlueprintPure, Category = "Health")
 	FText RequestChangeOfHealth();
+	UFUNCTION()
+	virtual void OnLifeChanged(int newLife, int maxLife);
 
 private:
 	UPROPERTY()
 	UHUDPlayer* player;
 	UPROPERTY()
 	AHUDView* hud; 
-	
+	UPROPERTY()
+	AAspiradoraGameCharacter* playerCharacter;
+
+	int life;
+	int maxLife;
 	
 };
