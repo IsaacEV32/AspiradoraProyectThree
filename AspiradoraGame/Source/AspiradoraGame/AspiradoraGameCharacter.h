@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
-#include "Public/HUD/HUDPlayer.h"
 #include "NativeGameplayTags.h"
 #include "GameplayTagContainer.h"
 #include "AspiradoraGameCharacter.generated.h"
@@ -43,8 +42,6 @@ class AAspiradoraGameCharacter : public ACharacter
 
 	
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HUD")
-	TObjectPtr<UHUDPlayer> hud;
 
 	/** Jump Input Action */
 	UPROPERTY(EditAnywhere, Category="Input")
@@ -112,20 +109,7 @@ public:
 
 	UFUNCTION()
 	void ResetDash();
-//Isaac
-	UFUNCTION()
-	void OnPointDamage(AActor* DamagedActor,
-		float Damage,
-		AController* InstigatedBy,
-		FVector HitLocation,
-		UPrimitiveComponent* FHitComponent,
-		FName BoneName,
-		FVector ShotFromDirection,
-		const UDamageType* DamageType,
-		AActor* DamageCauser);
-	UFUNCTION()
-	UHUDPlayer* GetHUDComponent();
-//
+
 	UFUNCTION()
 	void BeginPlay() override;
 	UFUNCTION(BlueprintCallable, Category = "Life")
@@ -136,11 +120,6 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "Life")
 	bool IsDead() const { return life <= 0; }
-
-	
-	//Evento de cambio de vida
-	UFUNCTION(BlueprintImplementableEvent, Category = "Life")
-	void OnLifeChanged(int NewLife, int MaxLife);
 
 	//Evento muerte
 	UFUNCTION(BlueprintImplementableEvent, Category = "Life")
@@ -167,6 +146,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Life", meta = (ClampMin = "0"))
 	int life;
 
+
+	//Delegate for any change in the players health
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Life")
 	FOnLifeChange onLifeChange;
 

@@ -24,7 +24,7 @@ AEnemigoPawn::AEnemigoPawn()
 
 	boxCollisionArea = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Collision"));
 	boxCollisionArea->SetupAttachment(Capsula);
-	boxCollisionArea->InitBoxExtent(FVector(110.0f,110.f,110.f));
+	boxCollisionArea->InitBoxExtent(FVector(50.f,50.f,50.f));
 
 
 	Movimiento = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("Movimiento"));
@@ -44,6 +44,7 @@ void AEnemigoPawn::BeginPlay()
 
 	GetWorldTimerManager().SetTimer(TimerComprobacion, this,
 		&AEnemigoPawn::ComprobarJugador, IntervaloComprobacion, true);
+	
 }
 
 void AEnemigoPawn::ComprobarJugador()
@@ -71,19 +72,8 @@ void AEnemigoPawn::ComprobarJugador()
 }
 void AEnemigoPawn::OnActorOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, TEXT("Actor entered in the overlap"));
-	if ((OtherActor->ActorHasTag("Player")))
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, TEXT("Player has the tag"));
-	}
-	else 
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, TEXT("Player has not the tag"));
-	}
-
 	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr) && (OtherActor->ActorHasTag("Player")))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, TEXT("Actor overlapped with damage area"));
 		bCanApplyDamage = true;
 		player = Cast<AActor>(OtherActor);
 		hit = SweepResult;

@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
-#include "HUD/HUDPlayer.h"
 #include "HUD/HUDView.h"
 #include "AspiradoraGameCharacter.h"
 #include "Kismet/GameplayStatics.h"
@@ -28,8 +27,6 @@ public:
 	virtual void OnLifeChanged(int newLife, int maxLife);
 
 private:
-	UPROPERTY()
-	UHUDPlayer* player;
 	UPROPERTY()
 	AHUDView* hud; 
 	UPROPERTY()

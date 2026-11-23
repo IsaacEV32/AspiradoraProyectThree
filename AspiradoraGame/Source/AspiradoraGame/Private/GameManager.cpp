@@ -10,11 +10,6 @@ UGameManager::UGameManager()
 void UGameManager::BeginPlay()
 {
 	ACharacter* characterInstance = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-	if (characterInstance == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("ACharacter is null"));
-	}
-	player = Cast<AAspiradoraGameCharacter>(characterInstance)->GetHUDComponent();
 	playerCharacter = Cast<AAspiradoraGameCharacter>(characterInstance);
 	playerCharacter->onLifeChange.AddUniqueDynamic(this, &UGameManager::OnLifeChanged);
 	hud = UGameplayStatics::GetPlayerController(this, 0)->GetHUD<AHUDView>();
@@ -22,26 +17,12 @@ void UGameManager::BeginPlay()
 
 FText UGameManager::RequestChangeOfHealth()
 {
-	if (!IsValid(player))
+	if (!IsValid(playerCharacter))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("The hud component is not available"));
 		FText textNull = FText::FromString("Cargando");
 		ACharacter* characterInstance = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-		player = Cast<AAspiradoraGameCharacter>(characterInstance)->GetHUDComponent();
 		playerCharacter = Cast<AAspiradoraGameCharacter>(characterInstance);
-		if (IsValid(playerCharacter))
-		{
-			playerCharacter->onLifeChange.AddUniqueDynamic(this, &UGameManager::OnLifeChanged);
-		}
-		return textNull;
-	}
-	if (playerCharacter == nullptr)
-	{
-		FText textNull = FText::FromString("Cargando player");
-		ACharacter* characterInstance = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-		player = Cast<AAspiradoraGameCharacter>(characterInstance)->GetHUDComponent();
-		playerCharacter = Cast<AAspiradoraGameCharacter>(characterInstance);
-		UE_LOG(LogTemp, Warning, TEXT("The player character is null"));
+		playerCharacter->onLifeChange.AddUniqueDynamic(this, &UGameManager::OnLifeChanged);
 		return textNull;
 	}
 	return hud->GetHealthIntText(playerCharacter->GetCurrentLife());

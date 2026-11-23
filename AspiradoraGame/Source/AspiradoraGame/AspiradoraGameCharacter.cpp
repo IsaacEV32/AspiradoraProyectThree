@@ -48,8 +48,6 @@ AAspiradoraGameCharacter::AAspiradoraGameCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
 
-	hud = CreateDefaultSubobject<UHUDPlayer>(TEXT("HUD"));
-
 	//Set default values for dash
 	canDash = true;
 	dashDistance = 6000.0f;
@@ -59,7 +57,6 @@ AAspiradoraGameCharacter::AAspiradoraGameCharacter()
 	maxLife = 3;
 	life = 3;
 	onLifeChange.Broadcast(life, maxLife);
-
 	
 	InteractableTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Player")));
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
@@ -68,8 +65,6 @@ AAspiradoraGameCharacter::AAspiradoraGameCharacter()
 void AAspiradoraGameCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	OnTakePointDamage.AddUniqueDynamic(this, &AAspiradoraGameCharacter::OnPointDamage);
-
 	OnTakeAnyDamage.AddDynamic(this, &AAspiradoraGameCharacter::TakeDamage);
 	maxLife = 3;
 	life = 3;
@@ -198,38 +193,14 @@ void AAspiradoraGameCharacter::ResetDash()
 {
 	canDash = true;
 }
-////Isaac
-void AAspiradoraGameCharacter::OnPointDamage(AActor* DamagedActor,
-	float Damage,
-	AController* InstigatedBy,
-	FVector HitLocation,
-	UPrimitiveComponent* FHitComponent,
-	FName BoneName,
-	FVector ShotFromDirection,
-	const UDamageType* DamageType,
-	AActor* DamageCauser)
-{
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, TEXT("Player received damage"));
-	int LifeLost = FMath::CeilToInt(Damage);
 
-	hud->ApplyDamage(true, LifeLost);
-}
-
-UHUDPlayer* AAspiradoraGameCharacter::GetHUDComponent()
-{
-	return hud;
-}
-////
 int32& AAspiradoraGameCharacter::GetCurrentLife()
 {
 	return life;
 }
 void AAspiradoraGameCharacter::TakeDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
-	/*const float Applied = Super::TakeDamage(damageAmount, damageEvent, eventInstigator, damageCauser);*/
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("I took damage"));
 	ReceiveDamage(FMath::RoundToInt(Damage));
-
 }
 
 void AAspiradoraGameCharacter::ReceiveDamage(int amount)
@@ -240,9 +211,7 @@ void AAspiradoraGameCharacter::ReceiveDamage(int amount)
 	}
 
 	life = FMath::Clamp(life - amount, 0, maxLife);
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("I receive damage"));
 	onLifeChange.Broadcast(life, maxLife);
-	//OnLifeChanged(life, maxLife);
 
 	if (life <= 0)
 	{
@@ -270,5 +239,5 @@ void AAspiradoraGameCharacter::Heal(int amount)
 	}
 
 	life = FMath::Clamp(life + amount, 0, maxLife);
-	OnLifeChanged(life, maxLife);
+	onLifeChange.Broadcast(life, maxLife);
 }
