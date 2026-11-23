@@ -12,6 +12,7 @@ void AStatesOfGame::ChangeState(EStatesOfGame newState)
 
 void AStatesOfGame::CheckState()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("I changed my state"));
 	switch (currentState)
 	{
 		case EStatesOfGame::InitialState:

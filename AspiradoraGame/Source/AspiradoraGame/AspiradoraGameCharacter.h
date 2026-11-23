@@ -7,6 +7,7 @@
 #include "Logging/LogMacros.h"
 #include "NativeGameplayTags.h"
 #include "GameplayTagContainer.h"
+#include "Public/GameManager.h"
 #include "AspiradoraGameCharacter.generated.h"
 
 class USpringArmComponent;
@@ -151,6 +152,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Life")
 	FOnLifeChange onLifeChange;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GameManager")
+	UGameManager* gameManager;
 	UPROPERTY(EditAnywhere)
 	float dashDistance;
 

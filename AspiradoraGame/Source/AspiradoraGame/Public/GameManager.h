@@ -5,8 +5,8 @@
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
 #include "HUD/HUDView.h"
-#include "AspiradoraGameCharacter.h"
 #include "Kismet/GameplayStatics.h"
+#include "StatesOfGame.h"
 #include "GameManager.generated.h"
 
 /**
@@ -26,11 +26,11 @@ public:
 	UFUNCTION()
 	virtual void OnLifeChanged(int newLife, int maxLife);
 
+	UPROPERTY()
+	AStatesOfGame* changeGameStateManager;
 private:
 	UPROPERTY()
 	AHUDView* hud; 
-	UPROPERTY()
-	AAspiradoraGameCharacter* playerCharacter;
 
 	int life;
 	int maxLife;

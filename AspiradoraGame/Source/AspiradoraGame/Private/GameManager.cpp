@@ -6,26 +6,31 @@ UGameManager::UGameManager()
 {
 	life = 3;
 	maxLife = 3;
+	
 }
 void UGameManager::BeginPlay()
 {
-	ACharacter* characterInstance = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-	playerCharacter = Cast<AAspiradoraGameCharacter>(characterInstance);
-	playerCharacter->onLifeChange.AddUniqueDynamic(this, &UGameManager::OnLifeChanged);
 	hud = UGameplayStatics::GetPlayerController(this, 0)->GetHUD<AHUDView>();
+	changeGameStateManager = Cast<AStatesOfGame>(GetWorld()->GetGameState());
+	changeGameStateManager->OnChangeState.AddUniqueDynamic(changeGameStateManager, &AStatesOfGame::ChangeState);
+	changeGameStateManager->OnChangeState.Broadcast(EStatesOfGame::InitialState);
 }
 
 FText UGameManager::RequestChangeOfHealth()
 {
-	if (!IsValid(playerCharacter))
+	if (!IsValid(hud))
 	{
 		FText textNull = FText::FromString("Cargando");
-		ACharacter* characterInstance = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-		playerCharacter = Cast<AAspiradoraGameCharacter>(characterInstance);
-		playerCharacter->onLifeChange.AddUniqueDynamic(this, &UGameManager::OnLifeChanged);
+		hud = UGameplayStatics::GetPlayerController(this, 0)->GetHUD<AHUDView>();
 		return textNull;
 	}
-	return hud->GetHealthIntText(playerCharacter->GetCurrentLife());
+	else if (!IsValid(changeGameStateManager))
+	{
+		changeGameStateManager = Cast<AStatesOfGame>(GetWorld()->GetGameState());
+		changeGameStateManager->OnChangeState.AddUniqueDynamic(changeGameStateManager, &AStatesOfGame::ChangeState);
+		changeGameStateManager->OnChangeState.Broadcast(EStatesOfGame::InitialState);
+	}
+	return hud->GetHealthIntText(life);
 
 }
 

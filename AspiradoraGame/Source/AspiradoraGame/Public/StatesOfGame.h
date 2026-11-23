@@ -17,6 +17,8 @@ enum class EStatesOfGame : uint8
 	Pause UMETA(DisplayName = "Pause"),
 	Dead UMETA(DisplayName = "Dead")
 };
+UDELEGATE()
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangingState, EStatesOfGame, currentState);
 UCLASS()
 class ASPIRADORAGAME_API AStatesOfGame : public AGameStateBase
 {
@@ -27,9 +29,7 @@ public:
 	void ChangeState(EStatesOfGame newState);
 	UFUNCTION()
 	void CheckState();
-	
+	FOnChangingState OnChangeState;
 private:
 	EStatesOfGame currentState;
-	
-	
 };

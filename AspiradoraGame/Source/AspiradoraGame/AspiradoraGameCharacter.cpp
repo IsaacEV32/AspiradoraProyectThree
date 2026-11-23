@@ -57,7 +57,7 @@ AAspiradoraGameCharacter::AAspiradoraGameCharacter()
 	maxLife = 3;
 	life = 3;
 	onLifeChange.Broadcast(life, maxLife);
-	
+
 	InteractableTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Player")));
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
@@ -65,6 +65,11 @@ AAspiradoraGameCharacter::AAspiradoraGameCharacter()
 void AAspiradoraGameCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	while (!IsValid(gameManager))
+	{
+		gameManager = Cast<UGameManager>(GetGameInstance());
+		onLifeChange.AddUniqueDynamic(gameManager, &UGameManager::OnLifeChanged);
+	}
 	OnTakeAnyDamage.AddDynamic(this, &AAspiradoraGameCharacter::TakeDamage);
 	maxLife = 3;
 	life = 3;
@@ -226,8 +231,7 @@ void AAspiradoraGameCharacter::ReceiveDamage(int amount)
 		{
 			DisableInput(PC);
 		}
-
-		OnDeath();
+		gameManager->changeGameStateManager->OnChangeState.Broadcast(EStatesOfGame::Dead);
 	}
 }
 

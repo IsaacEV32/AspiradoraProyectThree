@@ -24,7 +24,7 @@ AEnemigoPawn::AEnemigoPawn()
 
 	boxCollisionArea = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Collision"));
 	boxCollisionArea->SetupAttachment(Capsula);
-	boxCollisionArea->InitBoxExtent(FVector(50.f,50.f,50.f));
+	boxCollisionArea->InitBoxExtent(FVector(70.f,70.f,70.f));
 
 
 	Movimiento = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("Movimiento"));
