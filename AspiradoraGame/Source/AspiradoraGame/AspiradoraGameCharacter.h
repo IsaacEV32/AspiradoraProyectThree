@@ -63,6 +63,14 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* DashAction;
 
+	//Absorber con la aspiradora
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* AbsorbAction;
+
+	//Expular objeto absorvido
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* ReleaseAction;
+
 public:
 
 	/** Constructor */
@@ -129,6 +137,33 @@ public:
 	UFUNCTION()
 	int32& GetCurrentLife();
 
+	UFUNCTION(BlueprintCallable, Category = "Aspiradora")
+	void Absorb();
+
+	//Prueba si esta listo para absorber
+	UFUNCTION(BlueprintCallable, Category = "Aspiradora")
+	bool TryAbsorb(AActor* Target);
+
+	//Expulsa el objeto absorvido 
+	UFUNCTION(BlueprintCallable, Category = "Aspiradora")
+	AActor* Release();
+
+	//Devuelve la cantidad de objetos absorvidos
+	UFUNCTION(BlueprintPure, Category = "Aspiradora")
+	int GetAbsorbedCount() const { return absorbedObjects.Num(); }
+
+	//Devuelve si esta llena la aspiradora
+	UFUNCTION(BlueprintPure, Category = "Aspiradora")
+	bool IsVacuumFull() const { return absorbedObjects.Num() >= maxAbsorbedObjects; }
+
+	//Evento Abosrber
+	UFUNCTION(BlueprintImplementableEvent, Category = "Aspiradora")
+	void OnObjectAbsorbed(AActor* Object);
+
+	//Evento Expulsar
+	UFUNCTION(BlueprintImplementableEvent, Category = "Aspiradora")
+	void OnObjectReleased(AActor* Object);
+
 public:
 
 	/** Returns CameraBoom subobject **/
@@ -168,7 +203,13 @@ public:
 
 	UPROPERTY()
 	FTimerHandle unusedHandle;
-	//////////
 	
+	//Lista de objetos absorvidos
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Aspiradora")
+	TArray<TObjectPtr<AActor>> absorbedObjects;
+
+	//Maximo de objetos absorvibles
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Aspiradora", meta = (ClampMin = "1"))
+	int maxAbsorbedObjects;
 };
 
