@@ -12,6 +12,8 @@
 #include "InputActionValue.h"
 #include "AspiradoraGame.h"
 
+UE_DEFINE_GAMEPLAY_TAG(TAG_Player, "Player");
+
 AAspiradoraGameCharacter::AAspiradoraGameCharacter()
 {
 	// Set size for collision capsule
@@ -54,14 +56,21 @@ AAspiradoraGameCharacter::AAspiradoraGameCharacter()
 
 	maxLife = 3;
 	life = 3;
+	onLifeChange.Broadcast(life, maxLife);
 
+	InteractableTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Player")));
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
 void AAspiradoraGameCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
+	while (!IsValid(gameManager))
+	{
+		gameManager = Cast<UGameManager>(GetGameInstance());
+		onLifeChange.AddUniqueDynamic(gameManager, &UGameManager::OnLifeChanged);
+	}
+	OnTakeAnyDamage.AddDynamic(this, &AAspiradoraGameCharacter::TakeDamage);
 	maxLife = 3;
 	life = 3;
 }
@@ -190,12 +199,13 @@ void AAspiradoraGameCharacter::ResetDash()
 	canDash = true;
 }
 
-float AAspiradoraGameCharacter::TakeDamage(float damageAmount, FDamageEvent const& damageEvent,
-	AController* eventInstigator, AActor* damageCauser)
+int32& AAspiradoraGameCharacter::GetCurrentLife()
 {
-	const float Applied = Super::TakeDamage(damageAmount, damageEvent, eventInstigator, damageCauser);
-	ReceiveDamage(FMath::RoundToInt(Applied));
-	return Applied;
+	return life;
+}
+void AAspiradoraGameCharacter::TakeDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
+{
+	ReceiveDamage(FMath::RoundToInt(Damage));
 }
 
 void AAspiradoraGameCharacter::ReceiveDamage(int amount)
@@ -206,7 +216,7 @@ void AAspiradoraGameCharacter::ReceiveDamage(int amount)
 	}
 
 	life = FMath::Clamp(life - amount, 0, maxLife);
-	OnLifeChanged(life, maxLife);
+	onLifeChange.Broadcast(life, maxLife);
 
 	if (life <= 0)
 	{
@@ -221,8 +231,7 @@ void AAspiradoraGameCharacter::ReceiveDamage(int amount)
 		{
 			DisableInput(PC);
 		}
-
-		OnDeath();
+		gameManager->changeGameStateManager->OnChangeState.Broadcast(EStatesOfGame::Dead);
 	}
 }
 
@@ -234,5 +243,5 @@ void AAspiradoraGameCharacter::Heal(int amount)
 	}
 
 	life = FMath::Clamp(life + amount, 0, maxLife);
-	OnLifeChanged(life, maxLife);
+	onLifeChange.Broadcast(life, maxLife);
 }

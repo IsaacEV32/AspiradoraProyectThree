@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "Components/BoxComponent.h"
 #include "EnemigoPawn.generated.h"
 
 class UCapsuleComponent;
@@ -41,9 +42,30 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "IA")
 	float IntervaloComprobacion = 0.2f;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UDamageType> collisionDamage;
+	
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> boxCollisionArea;
+	UPROPERTY(EditAnywhere)
+	AActor* player;
+
+	UPROPERTY(EditAnywhere)
+	FHitResult hit;
+
+	bool bCanApplyDamage;
+	FTimerHandle damageTimerHandle;
 
 	FTimerHandle TimerComprobacion;
 	bool bPersiguiendo = false;
 
 	void ComprobarJugador();
+	UFUNCTION()
+	virtual void OnActorOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnActorOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UFUNCTION()
+	void ApplyDamage();
 };
