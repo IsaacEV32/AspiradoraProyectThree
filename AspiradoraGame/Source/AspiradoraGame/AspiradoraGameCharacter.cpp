@@ -12,6 +12,8 @@
 #include "InputActionValue.h"
 #include "AspiradoraGame.h"
 
+UE_DEFINE_GAMEPLAY_TAG(TAG_Player, "Player");
+
 AAspiradoraGameCharacter::AAspiradoraGameCharacter()
 {
 	// Set size for collision capsule
@@ -52,10 +54,26 @@ AAspiradoraGameCharacter::AAspiradoraGameCharacter()
 	dashCooldown = 0.5f;
 	dashStop = 0.1f;
 
+	maxLife = 3;
+	life = 3;
+	onLifeChange.Broadcast(life, maxLife);
+
+	InteractableTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Player")));
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
-
+void AAspiradoraGameCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	while (!IsValid(gameManager))
+	{
+		gameManager = Cast<UGameManager>(GetGameInstance());
+		onLifeChange.AddUniqueDynamic(gameManager, &UGameManager::OnLifeChanged);
+	}
+	OnTakeAnyDamage.AddDynamic(this, &AAspiradoraGameCharacter::TakeDamage);
+	maxLife = 3;
+	life = 3;
+}
 void AAspiradoraGameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	// Set up action bindings
@@ -179,4 +197,51 @@ void AAspiradoraGameCharacter::StopDashing()
 void AAspiradoraGameCharacter::ResetDash()
 {
 	canDash = true;
+}
+
+int32& AAspiradoraGameCharacter::GetCurrentLife()
+{
+	return life;
+}
+void AAspiradoraGameCharacter::TakeDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
+{
+	ReceiveDamage(FMath::RoundToInt(Damage));
+}
+
+void AAspiradoraGameCharacter::ReceiveDamage(int amount)
+{
+	if (IsDead() || amount <= 0)
+	{
+		return;
+	}
+
+	life = FMath::Clamp(life - amount, 0, maxLife);
+	onLifeChange.Broadcast(life, maxLife);
+
+	if (life <= 0)
+	{
+		if (!canDash)
+		{
+			StopDashing();
+		}
+
+		GetCharacterMovement()->StopMovementImmediately();
+
+		if (APlayerController* PC = Cast<APlayerController>(GetController()))
+		{
+			DisableInput(PC);
+		}
+		gameManager->changeGameStateManager->OnChangeState.Broadcast(EStatesOfGame::Dead);
+	}
+}
+
+void AAspiradoraGameCharacter::Heal(int amount)
+{
+	if (IsDead() || amount <= 0)
+	{
+		return;
+	}
+
+	life = FMath::Clamp(life + amount, 0, maxLife);
+	onLifeChange.Broadcast(life, maxLife);
 }
