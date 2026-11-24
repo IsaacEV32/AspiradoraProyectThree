@@ -15,7 +15,7 @@ AEnemigoPawn::AEnemigoPawn()
 	SetRootComponent(Capsula);
 	Capsula->InitCapsuleSize(40.f, 90.f);
 	Capsula->SetCollisionProfileName(TEXT("Pawn"));
-	Capsula->SetCanEverAffectNavigation(true); //era false
+	Capsula->SetCanEverAffectNavigation(false);
 
 	
 	Malla = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Malla"));
@@ -25,6 +25,7 @@ AEnemigoPawn::AEnemigoPawn()
 	boxCollisionArea = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Collision"));
 	boxCollisionArea->SetupAttachment(Capsula);
 	boxCollisionArea->InitBoxExtent(FVector(70.f,70.f,70.f));
+	boxCollisionArea->SetCanEverAffectNavigation(false);
 
 
 	Movimiento = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("Movimiento"));
